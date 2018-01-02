@@ -123,7 +123,7 @@ static int switch_clockrate(int rate, int baseclock) {
 }
 
 void sdc_lld_init(void) {
-    printf("SDC INIT\n");
+
 }
 
 
@@ -157,8 +157,6 @@ void sdc_lld_start(SDCDriver *sdcp) {
     }
     sdcp->emmc_base_clock_rate = tag[1];
 
-    printf("SDC get clock rate %ld %ld\n", tag[0], tag[1]);
-
     // reset host controller; disable clocks
     EMMC_CONTROL1 = CONTROL1_SRST_HC; 
     while(EMMC_CONTROL1 & (CONTROL1_SRST_HC | CONTROL1_SRST_CMD | CONTROL1_SRST_DATA)); //wait while any reset bit is high
@@ -174,13 +172,11 @@ void sdc_lld_start(SDCDriver *sdcp) {
     EMMC_IRPT_MASK = INTERRUPT_ALL; //unmask all interrupts
     EMMC_INTERRUPT = 0xffffffff; // reset all interrupts
  
-    DataMemBarrier();
-    printf("SDC START DONE\n");   
+    DataMemBarrier();  
 }
 
 
 void sdc_lld_stop(SDCDriver *sdcp) {
-    printf("SDC STOP\n");
 
 }
 
@@ -198,8 +194,7 @@ void sdc_lld_stop_clk(SDCDriver *sdcp) {
 }
 
 void sdc_lld_set_bus_mode(SDCDriver *sdcp, sdcbusmode_t mode) {
-    printf("SDC SET BUS MODE %d\n", mode);
-    
+  
     switch (mode) {
     case SDC_MODE_1BIT:
         EMMC_CONTROL0 = EMMC_CONTROL0 & ~(CONTROL0_HCTL_8BIT | CONTROL0_HCTL_DWIDTH);
@@ -286,7 +281,7 @@ bool_t sdc_lld_read(SDCDriver *sdcp, uint32_t startblk,
 {
     uint32_t resp[1];
     uint32_t emmc_interrupt;
-    uint32_t *buf32=(uint32_t*)buf;
+    uint32_t data;
     
     DataMemBarrier();
     
@@ -312,8 +307,12 @@ bool_t sdc_lld_read(SDCDriver *sdcp, uint32_t startblk,
             return CH_FAILED; //ERR is clear or INTERRUPT_READ_RDY is not set --> failiure
         }
 
-        for(int i=0;i<128;i++) { // 512 bytes = 128 words
-            *buf32++ = EMMC_DATA;
+        for(int i=0;i<128;i++) {
+            data = EMMC_DATA;
+            *buf++ = data & 0xff;
+            *buf++ = (data>>8) & 0xff;
+            *buf++ = (data>>16) & 0xff;
+            *buf++ = (data>>24) & 0xff;
         }
         
         startblk++;

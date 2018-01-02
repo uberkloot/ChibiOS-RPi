@@ -293,13 +293,12 @@ bool_t sdc_lld_read(SDCDriver *sdcp, uint32_t startblk,
 
     // TODO: also implement multiple-block transfers
     while(n) {
-        printf("SDC READ %ld \n", startblk);
         EMMC_INTERRUPT = INTERRUPT_ALL;
         
         EMMC_BLKSIZECNT = (1<<16) | 512; // 1 block of 512 bytes
         
         if (sdc_lld_send_cmd_x(MMCSD_CMD_READ_SINGLE_BLOCK, CMDTM_CMD_RSPNS_TYPE_48 | CMDTM_CMD_CRCCHK_EN | CMDTM_CMD_ISDATA | CMDTM_TM_DAT_DIR,
-                                    startblk*512, resp) || MMCSD_R1_ERROR(resp[0])) {
+                                    startblk, resp) || MMCSD_R1_ERROR(resp[0])) {
             printf("Failed\n");
     
             return CH_FAILED;

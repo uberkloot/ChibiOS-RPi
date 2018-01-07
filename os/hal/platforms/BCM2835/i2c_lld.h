@@ -163,7 +163,8 @@ struct I2CDriver {
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-extern I2CDriver I2C0;
+// extern I2CDriver I2C0;
+extern I2CDriver I2C1;
 
 #ifdef __cplusplus
 extern "C" {

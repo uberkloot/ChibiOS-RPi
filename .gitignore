@@ -3,3 +3,4 @@ TAGS
 *.bak
 .dep/
 build/
+*.o

@@ -40,6 +40,7 @@
 /*===========================================================================*/
 
 I2CDriver I2C0;
+I2CDriver I2C1;
 
 /*===========================================================================*/
 /* Driver local variables.                                                   */
@@ -138,8 +139,10 @@ void i2c_lld_serve_interrupt(I2CDriver *i2cp) {
  * @notapi
  */
 void i2c_lld_init(void) {
-  I2C0.device = BSC0_ADDR;
-  i2cObjectInit(&I2C0);
+  // I2C0.device = BSC0_ADDR;
+  // i2cObjectInit(&I2C0);
+  I2C1.device = BSC1_ADDR;
+  i2cObjectInit(&I2C1);
 }
 
 /**
@@ -151,8 +154,10 @@ void i2c_lld_init(void) {
  */
 void i2c_lld_start(I2CDriver *i2cp) {
   /* Set up GPIO pins for I2C */
-  bcm2835_gpio_fnsel(GPIO0_PAD, GPFN_ALT0);
-  bcm2835_gpio_fnsel(GPIO1_PAD, GPFN_ALT0);
+  // bcm2835_gpio_fnsel(GPIO0_PAD, GPFN_ALT0);
+  // bcm2835_gpio_fnsel(GPIO1_PAD, GPFN_ALT0);
+  bcm2835_gpio_fnsel(GPIO2_PAD, GPFN_ALT0); //I2C1
+  bcm2835_gpio_fnsel(GPIO3_PAD, GPFN_ALT0); //I2C1
 
   uint32_t speed = i2cp->config->ic_speed;
   if (speed != 0 && speed != 100000)
@@ -170,8 +175,10 @@ void i2c_lld_start(I2CDriver *i2cp) {
  */
 void i2c_lld_stop(I2CDriver *i2cp) {
   /* Set GPIO pin function to default */
-  bcm2835_gpio_fnsel(GPIO0_PAD, GPFN_IN);
-  bcm2835_gpio_fnsel(GPIO1_PAD, GPFN_IN);
+  // bcm2835_gpio_fnsel(GPIO0_PAD, GPFN_IN);
+  // bcm2835_gpio_fnsel(GPIO1_PAD, GPFN_IN);
+  bcm2835_gpio_fnsel(GPIO2_PAD, GPFN_IN); //I2C1
+  bcm2835_gpio_fnsel(GPIO3_PAD, GPFN_IN); //I2C1
 
   i2cp->device->control &= ~BSC_I2CEN;
 }
